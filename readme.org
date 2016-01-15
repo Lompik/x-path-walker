@@ -1,0 +1,19 @@
+#+TITLE: Navigation feature for JSON/XML/HTML based on path (imenu like)
+
+This package is a imenu like feature for JSON, XML/HTML files. It let you jump to line in the file based on the xpath for HTML files and JSON structure.
+
+* demo
+
+Example :
+
+[[file:Demo/xpathwalker-2016-01-14_18.04.29.mkv][Demo (mkv)]]
+
+* Install
+
+#+BEGIN_SRC elisp
+(require 'x-path-walker)
+#+END_SRC
+
+Currently on Helm front end is implemented (and python backend ).
+
+~M-x~ helm-x-path-walker
