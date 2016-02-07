@@ -31,17 +31,19 @@
 
 (defvar x-path-walker-objects-separators ".")
 
-(defvar x-path-walker-command `(,(concat "PYTHONPATH=" x-path-walker-source-dir)
+(defun x-path-walker-command ()
+  (list (concat "PYTHONPATH=" x-path-walker-source-dir)
                                 "python3"
-                                "-m xpathwalker") )
+                                "-m xpathwalker"))
 
 (defvar x-path-walker-verbose nil)
 
 (defun x-path-build-cmd-line (args)
-  (mapconcat #'identity
-             (append x-path-walker-command
-                     (eval 'args))
-             " "))
+  (let ((cmdpython (x-path-walker-command)))
+    (mapconcat #'identity
+             (append cmdpython
+                     args)
+             " ")))
 
 (defun x-path-run-py-script (args)
   (let ((cmd (x-path-build-cmd-line args)))
