@@ -24,10 +24,9 @@
 
 ;;; Code:
 
-(defvar x-path-walker-source-dir (concat (if load-file-name
-                                             (file-name-directory load-file-name)
-                                           default-directory)
-                                         "xpathwalker"))
+(setq x-path-walker-source-dir (concat (if load-file-name
+                                           (file-name-directory load-file-name)
+                                         default-directory)))
 
 (defvar x-path-walker-objects-separators ".")
 
