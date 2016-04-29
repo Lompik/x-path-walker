@@ -24,20 +24,20 @@
 
 ;;; Code:
 
-(setq x-path-walker-source-dir (concat (if load-file-name
-                                           (file-name-directory load-file-name)
-                                         default-directory)))
+(defvar x-path-walker-source-dir (concat (if load-file-name
+                                             (file-name-directory load-file-name)
+                                           default-directory)))
 
 (defvar x-path-walker-objects-separators ".")
 
 (defun x-path-walker-command ()
   (list (concat "PYTHONPATH=" x-path-walker-source-dir)
-                                "python3"
-                                "-m xpathwalker"))
+        (executable-find "python3")
+        "-m xpathwalker"))
 
 (defvar x-path-walker-verbose nil)
 
-(defun x-path-build-cmd-line (args)
+(defun x-path-build-cmd-path (args)
   (let ((cmdpython (x-path-walker-command)))
     (mapconcat #'identity
              (append cmdpython
@@ -45,46 +45,49 @@
              " ")))
 
 (defun x-path-run-py-script (args)
-  (let ((cmd (x-path-build-cmd-line args)))
+  (let ((cmd (x-path-build-cmd-path args)))
     (shell-command-to-string cmd)))
 
-(defun helm-x-path-walker-init (file)
-  (let ((cmd-line (x-path-build-cmd-line (list
-                                          (if (bound-and-true-p x-path-walker-verbose)
-                                              "-a"
-                                            "")
-                                          "-m"
-                                          "JSON"
-                                          file ))))
-    (prog1
-        (start-process-shell-command
-         "x-path-walker" helm-buffer cmd-line)
-      (set-process-sentinel
-       (get-buffer-process helm-buffer)
-       (lambda (_process event)
-         (when (string= event "finished\n")
-           (with-helm-window
-             (setq mode-line-format
-                   '(" " mode-line-buffer-identification " "
-                     (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                     (:eval (propertize
-                             (format
-                              "[%s process finished] "
-                              "x-path-helper")
-                             'face 'helm-grep-finish))))
-             (force-mode-line-update))))))))
+(if (featurep 'helm)
+    (progn
+      (require 'helm)
+      (defun helm-x-path-walker-init (file)
+        (let ((cmd-path (x-path-build-cmd-path (list
+                                                (if (bound-and-true-p x-path-walker-verbose)
+                                                    "-a"
+                                                  "")
+                                                "-m"
+                                                "JSON"
+                                                file ))))
+          (prog1
+              (start-process-shell-command
+               "x-path-walker" helm-buffer cmd-path)
+            (set-process-sentinel
+             (get-buffer-process helm-buffer)
+             (lambda (_process event)
+               (when (string= event "finished\n")
+                 (with-helm-window
+                   (setq mode-path-format
+                         '(" " mode-path-buffer-identification " "
+                           (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                           (:eval (propertize
+                                   (format
+                                    "[%s process finished] "
+                                    "x-path-helper")
+                                   'face 'helm-grep-finish))))
+                   (force-mode-path-update)))))))))
 
-(defun x-path-get-mode ()
-  (let ((mm (pcase major-mode
-              (`json-mode "JSON")
-              (`xml-mode "XML")
-              (`nxml-mode "XML")
-              (`html-mode "HTML")
-              (`web-mode "XML")
-              (code nil))))
-    (unless (and (buffer-file-name) mm)
-      (keyboard-quit))
-    mm))
+  (defun x-path-get-mode ()
+    (let ((mm (pcase major-mode
+                (`json-mode "JSON")
+                (`xml-mode "XML")
+                (`nxml-mode "XML")
+                (`html-mode "HTML")
+                (`web-mode "XML")
+                (code nil))))
+      (unless (and (buffer-file-name) mm)
+        (keyboard-quit))
+      mm)))
 
 (defun x-path-walker-ask ()
   (interactive)
@@ -94,22 +97,23 @@
     (if (buffer-modified-p)
         (keyboard-quit))))
 
-(defun x-path-walker-jump-line (line)
+(defun x-path-walker-jump-path (path)
   (let* ((mode (x-path-get-mode))
          (path (if (not (bound-and-true-p x-path-walker-verbose))
-                   line
+                   path
                  (if (or (string= mode "HTML")
                          (string= mode "XML"))
-                     (car (split-string line " | "))
+                     (car (split-string path " | "))
                    (if (and (string= mode "JSON") )
-                       (car (cdr (split-string line " | ")))
+                       (car (cdr (split-string path " | ")))
                      ""))))
-         (line (replace-regexp-in-string "\n$" ""
-                                         (x-path-run-py-script `("-x"
-                                                                 ,(shell-quote-argument path)
-                                                                 "-m"
-                                                                 ,mode
-                                                                 ,(buffer-file-name) )))))
+         (line (replace-regexp-in-string
+                "\n$" ""
+                (x-path-run-py-script `("-x"
+                                        ,(shell-quote-argument path)
+                                        "-m"
+                                        ,mode
+                                        ,(buffer-file-name) )))))
     (if (string= mode "JSON")
         (progn  (x-path-walker-ask)
                 (erase-buffer)
@@ -139,7 +143,7 @@
             :candidates  cands
             :candidate-number-limit 500
             :action (helm-make-actions
-                     "Jump to path" 'x-path-walker-jump-line)))
+                     "Jump to path" 'x-path-walker-jump-path)))
     (helm
      :sources 'helm-source-x-path-walker
      :prompt "Select Path:"

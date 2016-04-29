@@ -18,7 +18,8 @@ class lxmlProcessor(Processor):
                 if el.keys() is None:
                     res.append("/%s | %s | %s" % (parsed.getelementpath(el), ",".join(el.keys())))
                 else:
-                    res.append("/%s | %s" % (parsed.getelementpath(el), ",".join(["%s: %s" % (attr, el.get(key=attr)) for attr in el.keys()])))
+                    res.append("/%s | %s" % (parsed.getelementpath(el),
+                                             ",".join(["%s: %s" % (attr, el.get(key=attr)) for attr in el.keys()])))
             else:
                 res.append("/%s" % (parsed.getelementpath(el)))
         return(res)
@@ -48,15 +49,17 @@ class lxmlProcessor(Processor):
             raise ValueError("No data in parsed")
 
         parsed = self.parsed
-        xpath = xpath.split(" | ")[0] if (with_attrs is True) else xpath
+        xpath = xpath.split(" | ")[0] if (with_attrs is True or xpath.find(" | ") > -1) else xpath
         res = 0
-        args = {}
+        matchs = []
 
-        if(xpath.find("{")):  ## Handle namespace cases
+        if(xpath.find("{") > -1):  # Handle namespace cases
             xpath, args = self.handle_namespace_in_xpath(xpath)
-
-        if(len(parsed.xpath(xpath, **args)) > 0):
-            res = parsed.xpath(xpath, **args)[0].sourceline
+            matchs = parsed.xpath(xpath, **args)
+        else:
+            matchs = parsed.xpath(xpath)
+        if(len(matchs) > 0):
+            res = matchs[0].sourceline
         return(res)
 
 class HTML_Processor(lxmlProcessor):
