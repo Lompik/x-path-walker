@@ -1,12 +1,11 @@
 language: python
 python:
+  - "3.2"
   - "3.5"
 sudo: no
-addons:
-  apt:
-    packages:
-    - python3-lxml
+
 install:
+  - pip install --user lxml
   - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > travis.sh && source ./travis.sh
   - evm install $EVM_EMACS --use --skip
   - cask
@@ -22,3 +21,5 @@ matrix:
 script:
   - emacs --version
   - make test
+notifications:
+  email: false
