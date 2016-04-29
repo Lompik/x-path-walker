@@ -1,8 +1,11 @@
 language: python
+python:
+  - "3.5"
 sudo: no
-before_install:
-  - sudo pip install --upgrade pip
-  - sudo pip install lxml
+addons:
+  apt:
+    packages:
+    - python-lxml
 install:
   - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > travis.sh && source ./travis.sh
   - evm install $EVM_EMACS --use --skip
