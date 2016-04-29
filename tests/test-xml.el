@@ -29,7 +29,6 @@
  (before-each
   (require 'x-path-walker))
 
-
  (it "should match line numbers in XML files"
      (find-file "tests/data/complex.xml")
      (goto-char (random (point-max)))

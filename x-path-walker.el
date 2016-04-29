@@ -48,46 +48,17 @@
   (let ((cmd (x-path-build-cmd-path args)))
     (shell-command-to-string cmd)))
 
-(if (featurep 'helm)
-    (progn
-      (require 'helm)
-      (defun helm-x-path-walker-init (file)
-        (let ((cmd-path (x-path-build-cmd-path (list
-                                                (if (bound-and-true-p x-path-walker-verbose)
-                                                    "-a"
-                                                  "")
-                                                "-m"
-                                                "JSON"
-                                                file ))))
-          (prog1
-              (start-process-shell-command
-               "x-path-walker" helm-buffer cmd-path)
-            (set-process-sentinel
-             (get-buffer-process helm-buffer)
-             (lambda (_process event)
-               (when (string= event "finished\n")
-                 (with-helm-window
-                   (setq mode-path-format
-                         '(" " mode-path-buffer-identification " "
-                           (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                           (:eval (propertize
-                                   (format
-                                    "[%s process finished] "
-                                    "x-path-helper")
-                                   'face 'helm-grep-finish))))
-                   (force-mode-path-update)))))))))
-
-  (defun x-path-get-mode ()
-    (let ((mm (pcase major-mode
-                (`json-mode "JSON")
-                (`xml-mode "XML")
-                (`nxml-mode "XML")
-                (`html-mode "HTML")
-                (`web-mode "XML")
-                (code nil))))
-      (unless (and (buffer-file-name) mm)
-        (keyboard-quit))
-      mm)))
+(defun x-path-get-mode ()
+  (let ((mm (pcase major-mode
+              (`json-mode "JSON")
+              (`xml-mode "XML")
+              (`nxml-mode "XML")
+              (`html-mode "HTML")
+              (`web-mode "XML")
+              (code nil))))
+    (unless (and (buffer-file-name) mm)
+      (keyboard-quit))
+    mm))
 
 (defun x-path-walker-ask ()
   (interactive)
@@ -122,34 +93,62 @@
                                                  (buffer-file-name))
                                          (current-buffer))))
     (unless (or (string= "" line))
-      (goto-line (string-to-number line))
+      (goto-char 0)
+      (forward-line (1- (string-to-number line)))
       (recenter)
       (back-to-indentation))))
 
-(defun helm-x-path-walker()
-  (interactive)
-  (let* ((mode (x-path-get-mode))
-         (file (buffer-file-name))
-         (cmd-line `(,(if (bound-and-true-p x-path-walker-verbose)
-                          "-a"
-                        "")
-                     "-m"
-                     ,mode
-                     ,file ))
-         (cands  (split-string (x-path-run-py-script cmd-line)"\n")))
-    (setq helm-source-x-path-walker
-          (helm-build-sync-source "PATH-WALKER"
-            :keymap helm-map
-            :candidates  cands
-            :candidate-number-limit 500
-            :action (helm-make-actions
-                     "Jump to path" 'x-path-walker-jump-path)))
-    (helm
-     :sources 'helm-source-x-path-walker
-     :prompt "Select Path:"
-     :resume 'noresume
-     :keymap helm-map
-     :buffer "*helm path-walker*")))
+(if (featurep 'helm)
+    (progn (defun helm-x-path-walker-init (file)
+             (let ((cmd-path (x-path-build-cmd-path (list
+                                                     (if (bound-and-true-p x-path-walker-verbose)
+                                                         "-a"
+                                                       "")
+                                                     "-m"
+                                                     "JSON"
+                                                     file ))))
+               (prog1
+                   (start-process-shell-command
+                    "x-path-walker" helm-buffer cmd-path)
+                 (set-process-sentinel
+                  (get-buffer-process helm-buffer)
+                  (lambda (_process event)
+                    (when (string= event "finished\n")
+                      (with-helm-window
+                        (setq mode-path-format
+                              '(" " mode-path-buffer-identification " "
+                                (:eval (format "L%s" (helm-candidate-number-at-point))) " "
+                                (:eval (propertize
+                                        (format
+                                         "[%s process finished] "
+                                         "x-path-helper")
+                                        'face 'helm-grep-finish))))
+                        (force-mode-path-update))))))))
+
+           (defun helm-x-path-walker()
+             (interactive)
+             (let* ((mode (x-path-get-mode))
+                    (file (buffer-file-name))
+                    (cmd-line `(,(if (bound-and-true-p x-path-walker-verbose)
+                                     "-a"
+                                   "")
+                                "-m"
+                                ,mode
+                                ,file ))
+                    (cands  (split-string (x-path-run-py-script cmd-line)"\n")))
+               (setq helm-source-x-path-walker
+                     (helm-build-sync-source "PATH-WALKER"
+                       :keymap helm-map
+                       :candidates  cands
+                       :candidate-number-limit 500
+                       :action (helm-make-actions
+                                "Jump to path" 'x-path-walker-jump-path)))
+               (helm
+                :sources 'helm-source-x-path-walker
+                :prompt "Select Path:"
+                :resume 'noresume
+                :keymap helm-map
+                :buffer "*helm path-walker*")))))
 
 
 (provide 'x-path-walker)
