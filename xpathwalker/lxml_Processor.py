@@ -23,14 +23,40 @@ class lxmlProcessor(Processor):
                 res.append("/%s" % (parsed.getelementpath(el)))
         return(res)
 
+    def handle_namespace_in_xpath(self, xpath):
+        closinp = len(xpath.split("}"))
+        if(closinp > 1 and closinp != len(xpath.split("}"))):
+            return xpath
+        import re
+        import string
+        insidep = r"(?<={)[^}]*"
+        namesspaces = re.findall(insidep, xpath)
+        nsdict = {}
+
+        def get_letters(matchobj):
+            get_letters.counter += 1
+            id = string.ascii_letters[get_letters.counter]
+            nsdict.update({id: namesspaces[get_letters.counter]})
+            return id + ":"
+        get_letters.counter = -1
+        par = re.compile(r"{"+insidep+r"}")
+        xpath = par.sub(get_letters, xpath)
+        return (xpath, {"namespaces": nsdict})
+
     def get_path_line_number(self, xpath, with_attrs=False):
         if(not self.parsed):
             raise ValueError("No data in parsed")
+
         parsed = self.parsed
         xpath = xpath.split(" | ")[0] if (with_attrs is True) else xpath
         res = 0
-        if(len(parsed.xpath(xpath)) > 0):
-            res = parsed.xpath(xpath)[0].sourceline
+        args = {}
+
+        if(xpath.find("{")):  ## Handle namespace cases
+            xpath, args = self.handle_namespace_in_xpath(xpath)
+
+        if(len(parsed.xpath(xpath, **args)) > 0):
+            res = parsed.xpath(xpath, **args)[0].sourceline
         return(res)
 
 class HTML_Processor(lxmlProcessor):
