@@ -6,7 +6,7 @@ This package is a imenu like feature for JSON, XML/HTML files. It let you jump t
 
 Example :
 
-[[file:Demo/xpathwalker-2016-01-14_18.04.29.gif][Demo (gif)]]
+[[file:Demo/xpathwalker-2016-01-14_18.04.29.gif]]
 
 * Install
 
