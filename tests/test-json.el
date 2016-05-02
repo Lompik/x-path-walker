@@ -28,8 +28,7 @@
  "JSON tests"
  (before-each
   (setq bcup_savedir default-directory)
-  (require 'x-path-walker)
-  (require 'json-mode) )
+  (require 'x-path-walker))
 
  (after-each
   (setq  default-directory bcup_savedir))
@@ -37,6 +36,7 @@
  (it "should match line numbers in JSON files
 "
      (find-file "tests/data/complex.json")
+     (setq major-mode 'json-mode)
      (goto-char (random (point-max)))
      (x-path-walker-jump-path "[\"[tricky]\"][4][0]")
      (expect (line-number-at-pos) :to-equal 16)) )
