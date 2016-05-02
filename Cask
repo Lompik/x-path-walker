@@ -6,3 +6,4 @@
  (depends-on "buttercup"))
 
 (depends-on "helm")
+(depends-on "json-mode")

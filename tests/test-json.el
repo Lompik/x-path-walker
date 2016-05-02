@@ -1,4 +1,4 @@
-;;; test-xml.el --- Tests for xml files              -*- lexical-binding: t; -*-
+;;; test-json.el --- Tests for json files              -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016
 
@@ -25,20 +25,21 @@
 ;;; Code:
 
 (describe
- "xml tests"
+ "JSON tests"
  (before-each
   (setq bcup_savedir default-directory)
-  (require 'x-path-walker))
+  (require 'x-path-walker)
+  (require 'json-mode) )
 
  (after-each
   (setq  default-directory bcup_savedir))
 
- (it "should match line numbers in XML files
+ (it "should match line numbers in JSON files
 "
-     (find-file "tests/data/complex.xml")
+     (find-file "tests/data/complex.json")
      (goto-char (random (point-max)))
-     (x-path-walker-jump-path "/league/scoreboard/matchups/matchup[1]/teams/team[1]/team_logos/team_logo/url | ")
-     (expect (line-number-at-pos) :to-equal 46)) )
+     (x-path-walker-jump-path "[\"[tricky]\"][4][0]")
+     (expect (line-number-at-pos) :to-equal 16)) )
 
-(provide 'test-xml)
-;;; test-xml.el ends here
+(provide 'test-json)
+;;; test-json.el ends here

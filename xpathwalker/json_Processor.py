@@ -1,6 +1,7 @@
 from xpathwalker.utils import list_compare_idx
 from xpathwalker.processor import Processor
-from xpathwalker.utils import traverse_and_remove_path, get_dict_from_path, get_class
+from xpathwalker.utils import traverse_and_remove_path,\
+    get_dict_from_path, get_class
 import json
 from collections import MutableSequence, MutableMapping
 from collections import OrderedDict
@@ -8,6 +9,7 @@ from collections import OrderedDict
 ##########################################################################
 # JSON / Python                                                          #
 ##########################################################################
+
 
 class JSON_Processor(Processor):
     file_line_number = 0
@@ -77,6 +79,7 @@ class JSON_Processor(Processor):
 
     def get_path_line_number(self, path, with_attrs=False):
         path = path.split("| ")[1] if (with_attrs is True) else path
+
         orig = self.parsed
         path = get_dict_from_path(path, self.separator)
         res = traverse_and_remove_path(orig, path)
