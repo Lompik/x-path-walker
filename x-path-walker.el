@@ -99,33 +99,7 @@
       (back-to-indentation))))
 
 (if (featurep 'helm)
-    (progn (defun helm-x-path-walker-init (file)
-             (let ((cmd-path (x-path-build-cmd-path (list
-                                                     (if (bound-and-true-p x-path-walker-verbose)
-                                                         "-a"
-                                                       "")
-                                                     "-m"
-                                                     "JSON"
-                                                     file ))))
-               (prog1
-                   (start-process-shell-command
-                    "x-path-walker" helm-buffer cmd-path)
-                 (set-process-sentinel
-                  (get-buffer-process helm-buffer)
-                  (lambda (_process event)
-                    (when (string= event "finished\n")
-                      (with-helm-window
-                        (setq mode-path-format
-                              '(" " mode-path-buffer-identification " "
-                                (:eval (format "L%s" (helm-candidate-number-at-point))) " "
-                                (:eval (propertize
-                                        (format
-                                         "[%s process finished] "
-                                         "x-path-helper")
-                                        'face 'helm-grep-finish))))
-                        (force-mode-path-update))))))))
-
-           (defun helm-x-path-walker()
+    (progn (defun helm-x-path-walker()
              (interactive)
              (let* ((mode (x-path-get-mode))
                     (file (buffer-file-name))
