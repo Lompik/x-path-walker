@@ -25,6 +25,8 @@
 
 ;;; Code:
 
+(require 'helm)
+
 (defvar x-path-walker-source-dir (concat (if load-file-name
                                              (file-name-directory load-file-name)
                                            default-directory)))
