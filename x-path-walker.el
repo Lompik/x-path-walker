@@ -4,7 +4,7 @@
 
 ;; Author:  <lompik@ArchOrion>
 ;; Keywords: convenience
-;; Package-Requires: ((helm "1.9.2"))
+;; Package-Requires: ((helm-core "1.9.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
