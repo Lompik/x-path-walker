@@ -1,6 +1,8 @@
 #+TITLE: Navigation feature for JSON/XML/HTML based on path (imenu like)
 
-This package is a imenu like feature for JSON, XML/HTML files. It let you jump to line in the file based on the xpath for HTML files and JSON structure.
+This package is a imenu like feature for JSON, XML/HTML files. It let
+you jump to line in the file based on the xpath for HTML files and
+JSON structure.
 
 * demo
 
@@ -14,6 +16,21 @@ Example :
 (require 'x-path-walker)
 #+END_SRC
 
-Currently on Helm front end is implemented (and python backend ).
+** Requirement for python
+   - the ~lxml~ libraries (both python package and the C libraries) are neewd if you're looking into HTML/XML.
+The preferred way to install this dependency is by your system's package manager. However you can try your luck with:
+#+BEGIN_SRC shell
+pip install lxml (--user)
+#+END_SRC
+
+* usage
+Currently only Helm front end is implemented (and python backend). Once you are in a [HX]ML or JSON buffer:
 
 ~M-x~ helm-x-path-walker
+
+
+* todo
+
+  - YAML backend
+    - Currently the [[http://pyyaml.org/][PyYAML]] package for python does not keep the original layout of the data (as it goes to a dictionary)
+  - This package first started with the ~jq~ backend for JSON. But the python version is more efficient. It could be made optional though.
