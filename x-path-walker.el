@@ -4,7 +4,7 @@
 
 ;; Author:  <lompik@ArchOrion>
 ;; Keywords: convenience
-;; Package-Requires: ((helm "1.9.2"))
+;; Package-Requires: ((helm-core "1.9.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 ;;
 
 ;;; Code:
+
+(require 'helm)
 
 (defvar x-path-walker-source-dir (concat (if load-file-name
                                              (file-name-directory load-file-name)
@@ -99,31 +101,29 @@
       (recenter)
       (back-to-indentation))))
 
-(progn (defun helm-x-path-walker()
-         (interactive)
-         (let* ((mode (x-path-get-mode))
-                (file (buffer-file-name))
-                (cmd-line `(,(if (bound-and-true-p x-path-walker-verbose)
-                                 "-a"
-                               "")
-                            "-m"
-                            ,mode
-                            ,file ))
-                (cands  (split-string (x-path-run-py-script cmd-line)"\n")))
-           (setq helm-source-x-path-walker
-                 (helm-build-sync-source "PATH-WALKER"
-                   :keymap helm-map
-                   :candidates  cands
-                   :candidate-number-limit 500
-                   :action (helm-make-actions
-                            "Jump to path" 'x-path-walker-jump-path)))
-           (helm
-            :sources 'helm-source-x-path-walker
-            :prompt "Select Path:"
-            :resume 'noresume
-            :keymap helm-map
-            :buffer "*helm path-walker*"))))
-
+;;;###autoload
+(defun helm-x-path-walker()
+  (interactive)
+  (let* ((mode (x-path-get-mode))
+         (file (buffer-file-name))
+         (cmd-line `(,(if (bound-and-true-p x-path-walker-verbose)
+                          "-a"
+                        "")
+                     "-m"
+                     ,mode
+                     ,file ))
+         (cands  (split-string (x-path-run-py-script cmd-line)"\n")))
+    (helm
+     :sources (helm-build-sync-source "PATH-WALKER"
+                :keymap helm-map
+                :candidates  cands
+                :candidate-number-limit 500
+                :action (helm-make-actions
+                         "Jump to path" 'x-path-walker-jump-path))
+     :prompt "Select Path:"
+     :resume 'noresume
+     :keymap helm-map
+     :buffer "*helm path-walker*")))
 
 (provide 'x-path-walker)
 ;;; x-path-walker.el ends here
