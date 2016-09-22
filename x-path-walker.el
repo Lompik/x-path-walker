@@ -57,7 +57,7 @@
               (`xml-mode "XML")
               (`nxml-mode "XML")
               (`html-mode "HTML")
-              (`web-mode "XML")
+              (`web-mode "HTML")
               (code nil))))
     (unless (and (buffer-file-name) mm)
       (keyboard-quit))
