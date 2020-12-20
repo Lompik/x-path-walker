@@ -43,9 +43,9 @@
 (defun x-path-build-cmd-path (args)
   (let ((cmdpython (x-path-walker-command)))
     (mapconcat #'identity
-             (append cmdpython
-                     args)
-             " ")))
+               (append cmdpython
+                       args)
+               " ")))
 
 (defun x-path-run-py-script (args)
   (let ((cmd (x-path-build-cmd-path args)))
