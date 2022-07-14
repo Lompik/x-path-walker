@@ -4,7 +4,7 @@
 
 ;; Author:  <lompik@ArchOrion>
 ;; Keywords: convenience
-;; Package-Requires: ((helm-core "1.9.2"))
+;; Package-Requires: ((helm-core "3.6.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(require 'helm)
+(require 'helm-core)
 
 (defvar x-path-walker-source-dir (concat (if load-file-name
                                              (file-name-directory load-file-name)
